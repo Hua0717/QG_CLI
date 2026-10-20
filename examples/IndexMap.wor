@@ -1,0 +1,117 @@
+!Workspace
+!Version 650
+!Charset WindowsLatin1
+Open Table "Index Map\Indexmap_8ch" As Indexmap Interactive
+Open Table "Index Map\Indexmap_1ch" As Indexmap_1ch Interactive
+Open Table "Index Map\Indexmap_2ch" As Indexmap_2ch Interactive
+Open Table "Index Map\Indexmap_4ch" As Indexmap_4ch Interactive
+Open Table "\\sqlsvr\ekadas05\NDCDB_CCL\Download\NDCDB_CCL_LOT" As NDCDB_CCL_LOT Interactive
+Open Table "\\sqlsvr\ekadas05\NDCDB_CCL\Download\REL_NDCDB_CCL_LOT" As REL_NDCDB_CCL_LOT Interactive
+Open Table "\\sqlsvr\ekadas05\NDCDB_CCL\Download\NEW_PDUK_CCL_LOT" As NEW_PDUK_CCL_LOT Interactive
+Open Table "\\sqlsvr\ekadas05\NDCDB_CCL\Download\C3_CCL_LOT" As C3_CCL_LOT Interactive
+Open Table "\\sqlsvr\ekadas05\NDCDB\Download\NDCDBLOT" As NDCDB_LOT Interactive
+Open Table "\\sqlsvr\ekadas05\AdmBoundary\Cache\T_daerah" As Admbdy_Daerah Interactive
+Open Table "\\sqlsvr\ekadas05\Open Street Map Table\_OpenStreetMap" As _OpenStreetMap Interactive
+StatusBar Hide
+Map From Indexmap_1ch,Indexmap_2ch,Indexmap_4ch,Indexmap,NDCDB_CCL_LOT,REL_NDCDB_CCL_LOT,NEW_PDUK_CCL_LOT,C3_CCL_LOT,NDCDB_LOT,Admbdy_Daerah,_OpenStreetMap
+  Position (0.0520833,0.0520833) Units "in"
+  Width 5.29167 Units "in" Height 3.01042 Units "in" Min
+Set Window FrontWindow() ScrollBars Off Autoscroll On
+Set Map
+  image reprojection always resampling nearestneighbor
+  CoordSys Earth Projection 30, 33, "m", 101.9397026917, 2.7121205083, 0, 0
+  Center (28661.12556,13555.53492)
+  Zoom 223101.4574 Units "m"
+  Preserve Zoom Display Zoom
+  Distance Units "m" Area Units "sq m" XY Units "m"
+  Distance Type Cartesian
+Set Map
+  Layer 1
+    Display Off
+    Global Pen (1,2,16711680)  Brush (1,16777215,16777215)  Symbol (40,16711680,12)  Line (1,2,16711680)  Font ("Arial",0,9,0)
+    Label Line Arrow Position Right Font ("Arial",0,9,0) Pen (1,2,0)
+      With NOPETA
+      Parallel On Auto Off Overlap Off Duplicates On Offset 2
+      Visibility On
+  Layer 2
+    Display Off
+    Global Pen (1,2,16711680)  Brush (1,16777215,16777215)  Symbol (40,16711680,12)  Line (1,2,16711680)  Font ("Arial",0,9,0)
+    Label Line Arrow Position Right Font ("Arial",0,9,0) Pen (1,2,0)
+      With NOPETA
+      Parallel On Auto Off Overlap Off Duplicates On Offset 2
+      Visibility On
+  Layer 3
+    Display Off
+    Global Pen (1,2,16711680)  Brush (1,16777215,16777215)  Symbol (40,16711680,8)  Line (1,2,16711680)  Font ("Arial",0,9,0)
+    Label Line None Position Center Font ("Arial",0,9,0) Pen (1,2,0)
+      With NOPETA
+      Parallel On Auto Off Overlap Off Duplicates On Offset 2
+      Visibility On
+  Layer 4
+    Display Graphic
+    Global Pen (1,2,16711680)  Brush (1,16777215,16777215)  Symbol (35,0,12)  Line (1,2,0)  Font ("Arial",0,9,0)
+    Label Line None Position Center Font ("Arial",0,9,0) Pen (1,2,0)
+      With NOPETA
+      Parallel On Auto On Overlap Off Duplicates On Offset 2
+      Visibility On
+  Layer 5
+    Display Global
+    Global Pen (1,2,0)  Brush (2,14745520,16777215)  Symbol (35,0,12)  Line (1,2,0)  Font ("Arial",0,9,0)
+    Zoom (0, 10000) Units "m"
+    Label Line None Position Center Font ("Arial",0,12,0) Pen (1,2,0)
+      With NEGERI
+      Parallel On Auto Off Overlap Off Duplicates On Offset 2
+      Visibility On
+  Layer 6
+    Display Global
+    Global Pen (1,2,0)  Brush (2,14745520,16777215)  Symbol (35,0,12)  Line (1,2,0)  Font ("Arial",0,9,0)
+    Zoom (0, 10000) Units "m"
+    Label Line None Position Center Font ("Arial",0,12,0) Pen (1,2,0)
+      With NEGERI
+      Parallel On Auto Off Overlap Off Duplicates On Offset 2
+      Visibility On
+  Layer 7
+    Display Global
+    Global Pen (1,2,0)  Brush (2,14745520,16777215)  Symbol (35,0,12)  Line (1,2,0)  Font ("Arial",0,9,0)
+    Zoom (0, 10000) Units "m"
+    Label Line None Position Center Font ("Arial",0,12,0) Pen (1,2,0)
+      With NEGERI
+      Parallel On Auto Off Overlap Off Duplicates On Offset 2
+      Visibility On
+  Layer 8
+    Display Global
+    Global Pen (1,2,0)  Brush (2,14745520,16777215)  Symbol (35,0,12)  Line (1,2,0)  Font ("Arial",0,9,0)
+    Zoom (0, 10000) Units "m"
+    Label Line None Position Center Font ("Arial",0,12,0) Pen (1,2,0)
+      With NEGERI
+      Parallel On Auto Off Overlap Off Duplicates On Offset 2
+      Visibility On
+  Layer 9
+    Display Global
+    Global Pen (1,2,0)  Brush (15,11599792,16777215)  Symbol (35,0,12)  Line (1,2,0)  Font ("Arial",0,9,0)
+    Zoom (0, 10000) Units "m"
+    Label Line None Position Center Font ("Arial",0,9,0) Pen (1,2,0)
+      With LOT
+      Parallel On Auto Off Overlap Off Duplicates On Offset 2
+      Visibility On
+  Layer 10
+    Display Global
+    Global Pen (1,20,16711680)  Brush (1,16777215,16777215)  Symbol (35,0,12)  Line (1,2,0)  Font ("Arial",0,9,0)
+    Label Line None Position Center Font ("Arial",0,12,0) Pen (1,2,0)
+      With KETERANGAN
+      Parallel On Auto Off Overlap Off Duplicates On Offset 2
+      Visibility On
+  Layer 11
+    Display Off
+    Global Pen (1,2,0)  Brush (2,16777215,16777215)  Symbol (35,0,12)  Line (1,2,0)  Font ("Arial",0,9,0)
+    Selectable On
+  contrast 50
+  brightness 50
+  alpha 255
+    transparency on
+  color 16777215
+    grayscale off
+Dim WorkspaceMaximizedWindow As Integer
+WorkspaceMaximizedWindow = Frontwindow()
+Set Window WorkspaceMaximizedWindow Max
+Undim WorkspaceMaximizedWindow

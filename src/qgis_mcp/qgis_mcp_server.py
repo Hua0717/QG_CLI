@@ -4,6 +4,7 @@ QGIS MCP Client - Simple client to connect to the QGIS MCP server
 """
 
 import logging
+import os
 from contextlib import asynccontextmanager
 import socket
 import json
@@ -98,7 +99,8 @@ def get_qgis_connection():
     
     # Create a new connection if needed
     if _qgis_connection is None:
-        _qgis_connection = QgisMCPServer(host="localhost", port=9876)
+        port = int(os.environ.get("QGIS_MCP_PORT", "9876"))
+        _qgis_connection = QgisMCPServer(host="localhost", port=port)
         if not _qgis_connection.connect():
             logger.error("Failed to connect to Qgis")
             _qgis_connection = None

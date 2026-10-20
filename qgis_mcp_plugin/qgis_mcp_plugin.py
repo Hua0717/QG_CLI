@@ -148,6 +148,8 @@ class QgisMCPServer(QObject):
                 "save_project": self.save_project,
                 "render_map": self.render_map,
                 "create_new_project": self.create_new_project,
+                "quit_qgis": self.quit_qgis,
+                "screenshot": self.screenshot,
             }
             
             handler = handlers.get(cmd_type)
@@ -174,6 +176,19 @@ class QgisMCPServer(QObject):
         """Simple ping command"""
         return {"pong": True}
     
+    def quit_qgis(self, save=False, **kwargs):
+        """Close QGIS (reply first, quit shortly after). Never prompts to save."""
+        project = QgsProject.instance()
+        saved = None
+        if save and project.fileName():
+            if not project.write():
+                raise Exception(f"Failed to save project to {project.fileName()}")
+            saved = project.fileName()
+        # Clearing first avoids QGIS's "temporary layers will be lost" confirmation dialog
+        project.clear()
+        QTimer.singleShot(300, self.iface.actionExit().trigger)
+        return {"quitting": True, "saved": saved}
+
     def get_qgis_info(self, **kwargs):
         """Get basic QGIS information"""
         return {
@@ -475,6 +490,20 @@ class QgisMCPServer(QObject):
         else:
             raise Exception(f"Failed to save project to {path}")
     
+    def screenshot(self, path, target="window", **kwargs):
+        """Grab a screenshot of the QGIS main window, or only the map canvas"""
+        if target == "canvas":
+            widget = self.iface.mapCanvas()
+        elif target == "window":
+            widget = self.iface.mainWindow()
+        else:
+            raise Exception(f"Unknown target: {target} (use 'window' or 'canvas')")
+        pixmap = widget.grab()
+        if not pixmap.save(path):
+            raise Exception(f"Failed to save screenshot to {path}")
+        return {"path": path, "target": target,
+                "width": pixmap.width(), "height": pixmap.height()}
+
     def render_map(self, path, width=800, height=600, **kwargs):
         """Render the current map view to an image"""
         try:
