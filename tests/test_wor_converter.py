@@ -10,8 +10,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from qgis.core import QgsApplication, QgsFeatureRequest, Qgis, QgsProject
 from osgeo import ogr, osr
-from qgis_mcp.wor_model import read_workspace, parse_workspace
-from qgis_mcp.wor_converter import SourceSpec, build_project, convert_workspace, workspace_crs
+from qg.wor_model import read_workspace, parse_workspace
+from qg.wor_converter import SourceSpec, build_project, convert_workspace, workspace_crs
 
 ROOT = Path(__file__).resolve().parents[1]
 COORDSYS = 'CoordSys Earth Projection 30, 33, "m", 101.9397026917, 2.7121205083, 0, 0'
@@ -160,7 +160,7 @@ class ConverterTests(unittest.TestCase):
         self.assertFalse(output.exists())
 
     def test_graphic_database_is_not_silently_flattened(self):
-        from qgis_mcp.wor_converter import _style_layer
+        from qg.wor_converter import _style_layer
         ws = self.sample()
         from qgis.core import QgsVectorLayer
         layer = QgsVectorLayer(str(self.path), "test", "ogr")
@@ -168,7 +168,7 @@ class ConverterTests(unittest.TestCase):
             _style_layer(layer, ws.layers[3], SourceSpec(kind="mssql"), ws.window_width_m, [])
 
     def test_explicit_graphic_database_fallback_is_reported(self):
-        from qgis_mcp.wor_converter import _style_layer
+        from qg.wor_converter import _style_layer
         from qgis.core import QgsVectorLayer
         ws = self.sample()
         layer = QgsVectorLayer(str(self.path), "test", "ogr")
@@ -178,7 +178,7 @@ class ConverterTests(unittest.TestCase):
         self.assertTrue(any("USER-ACCEPTED FALLBACK" in n for n in warnings))
 
     def test_mixed_geometry_is_rejected(self):
-        from qgis_mcp.wor_converter import _load_layer
+        from qg.wor_converter import _load_layer
         path = self.path.parent / "mixed.tab"
         ds = ogr.GetDriverByName("MapInfo File").CreateDataSource(str(path))
         layer = ds.CreateLayer("mixed", None, ogr.wkbUnknown)
@@ -191,14 +191,14 @@ class ConverterTests(unittest.TestCase):
             _load_layer("mixed", SourceSpec(path=str(path), source_crs="EPSG:3857"))
 
     def test_linked_tab_requires_explicit_database_source(self):
-        from qgis_mcp.wor_converter import _load_layer
+        from qg.wor_converter import _load_layer
         path = self.path.parent / "linked.tab"
         path.write_text('!table\nmetadata\n"DATALINK\\\\ConnectionString" = "not-a-real-server"\n', encoding="ascii")
         with self.assertRaisesRegex(ValueError, "database-linked"):
             _load_layer("linked", SourceSpec(path=str(path)))
 
     def test_database_choices_require_credentials_without_connecting(self):
-        from qgis_mcp.wor_converter import _load_layer
+        from qg.wor_converter import _load_layer
         source = SourceSpec(kind="mssql", host="never-connect.invalid", database="not-real",
                             schema="dbo", table="lots", geometry="geom", key="id")
         with self.assertRaisesRegex(ValueError, "authentication|provider"):
@@ -207,7 +207,7 @@ class ConverterTests(unittest.TestCase):
     def test_database_key_is_optional_and_explicit_keys_are_checked(self):
         from unittest.mock import patch
         from qgis.core import QgsDataSourceUri, QgsVectorLayer
-        from qgis_mcp.wor_converter import _load_layer
+        from qg.wor_converter import _load_layer
         captured = []
 
         class LocalDatabaseLayer(QgsVectorLayer):
@@ -216,8 +216,8 @@ class ConverterTests(unittest.TestCase):
                 super().__init__("Point?crs=EPSG:3857&field=id:integer", alias, "memory")
 
         # Substitute local memory layers: never contact a database during these tests.
-        with patch("qgis_mcp.wor_converter.QgsVectorLayer", LocalDatabaseLayer), \
-             patch("qgis_mcp.wor_converter.QgsProviderRegistry"):
+        with patch("qg.wor_converter.QgsVectorLayer", LocalDatabaseLayer), \
+             patch("qg.wor_converter.QgsProviderRegistry"):
             for provider in ("oracle", "mssql"):
                 for key in ("", "id", "missing"):
                     with self.subTest(provider=provider, key=key):

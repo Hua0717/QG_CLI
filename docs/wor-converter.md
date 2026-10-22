@@ -95,7 +95,7 @@ Mixed-geometry TAB sources must be split into geometry-specific layers before co
 WOR is a scripting format, not just a layer list. The converter supports a defined subset and reports unsupported/mismatched settings as parser or conversion warnings. It does not run MapBasic commands. A saved project is not a guarantee of pixel-identical rendering or that every source will be available on another computer. Review all warnings and inspect the result in QGIS.
 
 - **No runtime found:** install QGIS with Python support or set `QGIS_ROOT`; do not install a package named `qgis` with pip.
-- **Runtime starts but the UI does not:** use a QGIS 3.x installation and ensure the runner and `src/qgis_mcp/wor_*.py` files are present in this checkout.
+- **Runtime starts but the UI does not:** use a QGIS 3.x installation and ensure the runner and `src/qg/wor_*.py` files are present in this checkout.
 - **Convert remains disabled:** confirm every layer individually, including initially hidden layers, and enter an output path.
 - **Wrong TAB location:** select the original WOR or browse to the actual TAB file; copying the WOR does not copy its data.
 - **Database failure:** verify the explicit connection settings, matching provider/client installation, auth configuration, and source CRS/key/geometry settings. Loading a WOR intentionally does not validate these remotely.

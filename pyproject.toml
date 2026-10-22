@@ -1,9 +1,6 @@
 [project]
-name = "qgis-mcp"
+name = "qg"
 version = "0.1.0"
-description = "Add your description here"
+description = "qg - a QGIS remote-control CLI (JSON over TCP, stdlib only)"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = [
-    "mcp[cli]>=1.3.0",
-]

@@ -11,7 +11,7 @@ from qgis.PyQt.QtWidgets import QAction, QDockWidget, QVBoxLayout, QLabel, QPush
 from qgis.PyQt.QtGui import QIcon, QColor
 from qgis.utils import active_plugins
 
-class QgisMCPServer(QObject):
+class QgServer(QObject):
     """Server class to handle socket connections and execute QGIS commands"""
     
     def __init__(self, host='localhost', port=9876, iface=None):
@@ -41,10 +41,10 @@ class QgisMCPServer(QObject):
             self.timer.timeout.connect(self.process_server)
             self.timer.start(100)  # 100ms interval
             
-            QgsMessageLog.logMessage(f"QGIS MCP server started on {self.host}:{self.port}", "QGIS MCP")
+            QgsMessageLog.logMessage(f"qg server started on {self.host}:{self.port}", "qg server")
             return True
         except Exception as e:
-            QgsMessageLog.logMessage(f"Failed to start server: {str(e)}", "QGIS MCP", Qgis.Critical)
+            QgsMessageLog.logMessage(f"Failed to start server: {str(e)}", "qg server", Qgis.Critical)
             self.stop()
             return False
             
@@ -63,7 +63,7 @@ class QgisMCPServer(QObject):
             
         self.socket = None
         self.client = None
-        QgsMessageLog.logMessage("QGIS MCP server stopped", "QGIS MCP")
+        QgsMessageLog.logMessage("qg server stopped", "qg server")
     
     def process_server(self):
         """Process server operations (called by timer)"""
@@ -76,11 +76,11 @@ class QgisMCPServer(QObject):
                 try:
                     self.client, address = self.socket.accept()
                     self.client.setblocking(False)
-                    QgsMessageLog.logMessage(f"Connected to client: {address}", "QGIS MCP")
+                    QgsMessageLog.logMessage(f"Connected to client: {address}", "qg server")
                 except BlockingIOError:
                     pass  # No connection waiting
                 except Exception as e:
-                    QgsMessageLog.logMessage(f"Error accepting connection: {str(e)}", "QGIS MCP", Qgis.Warning)
+                    QgsMessageLog.logMessage(f"Error accepting connection: {str(e)}", "qg server", Qgis.Warning)
                 
             # Process existing connection
             if self.client:
@@ -104,27 +104,27 @@ class QgisMCPServer(QObject):
                                 pass
                         else:
                             # Connection closed by client
-                            QgsMessageLog.logMessage("Client disconnected", "QGIS MCP")
+                            QgsMessageLog.logMessage("Client disconnected", "qg server")
                             self.client.close()
                             self.client = None
                             self.buffer = b''
                     except BlockingIOError:
                         pass  # No data available
                     except Exception as e:
-                        QgsMessageLog.logMessage(f"Error receiving data: {str(e)}", "QGIS MCP", Qgis.Warning)
+                        QgsMessageLog.logMessage(f"Error receiving data: {str(e)}", "qg server", Qgis.Warning)
                         self.client.close()
                         self.client = None
                         self.buffer = b''
                         
                 except Exception as e:
-                    QgsMessageLog.logMessage(f"Error with client: {str(e)}", "QGIS MCP", Qgis.Warning)
+                    QgsMessageLog.logMessage(f"Error with client: {str(e)}", "qg server", Qgis.Warning)
                     if self.client:
                         self.client.close()
                         self.client = None
                     self.buffer = b''
                     
         except Exception as e:
-            QgsMessageLog.logMessage(f"Server error: {str(e)}", "QGIS MCP", Qgis.Critical)
+            QgsMessageLog.logMessage(f"Server error: {str(e)}", "qg server", Qgis.Critical)
 
     def execute_command(self, command):
         """Execute a command"""
@@ -155,19 +155,19 @@ class QgisMCPServer(QObject):
             handler = handlers.get(cmd_type)
             if handler:
                 try:
-                    QgsMessageLog.logMessage(f"Executing handler for {cmd_type}", "QGIS MCP")
+                    QgsMessageLog.logMessage(f"Executing handler for {cmd_type}", "qg server")
                     result = handler(**params)
-                    QgsMessageLog.logMessage(f"Handler execution complete", "QGIS MCP")
+                    QgsMessageLog.logMessage(f"Handler execution complete", "qg server")
                     return {"status": "success", "result": result}
                 except Exception as e:
-                    QgsMessageLog.logMessage(f"Error in handler: {str(e)}", "QGIS MCP", Qgis.Critical)
+                    QgsMessageLog.logMessage(f"Error in handler: {str(e)}", "qg server", Qgis.Critical)
                     traceback.print_exc()
                     return {"status": "error", "message": str(e)}
             else:
                 return {"status": "error", "message": f"Unknown command type: {cmd_type}"}
                 
         except Exception as e:
-            QgsMessageLog.logMessage(f"Error executing command: {str(e)}", "QGIS MCP", Qgis.Critical)
+            QgsMessageLog.logMessage(f"Error executing command: {str(e)}", "qg server", Qgis.Critical)
             traceback.print_exc()
             return {"status": "error", "message": str(e)}
     
@@ -544,12 +544,12 @@ class QgisMCPServer(QObject):
             raise Exception(f"Render error: {str(e)}")
 
 
-class QgisMCPDockWidget(QDockWidget):
-    """Dock widget for the QGIS MCP plugin"""
+class QgDockWidget(QDockWidget):
+    """Dock widget for the qg server plugin"""
     closed = pyqtSignal()
     
     def __init__(self, iface):
-        super().__init__("QGIS MCP")
+        super().__init__("qg server")
         self.iface = iface
         self.server = None
         self.setup_ui()
@@ -590,7 +590,7 @@ class QgisMCPDockWidget(QDockWidget):
         """Start the server"""
         if not self.server:
             port = self.port_spin.value()
-            self.server = QgisMCPServer(port=port, iface=self.iface)
+            self.server = QgServer(port=port, iface=self.iface)
             
         if self.server.start():
             self.status_label.setText(f"Server: Running on port {self.server.port}")
@@ -616,8 +616,8 @@ class QgisMCPDockWidget(QDockWidget):
         super().closeEvent(event)
 
 
-class QgisMCPPlugin:
-    """Main plugin class for QGIS MCP"""
+class QgPlugin:
+    """Main plugin class for the qg server plugin"""
     
     def __init__(self, iface):
         self.iface = iface
@@ -628,14 +628,14 @@ class QgisMCPPlugin:
         """Initialize GUI"""
         # Create action
         self.action = QAction(
-            "QGIS MCP",
+            "qg server",
             self.iface.mainWindow()
         )
         self.action.setCheckable(True)
         self.action.triggered.connect(self.toggle_dock)
         
         # Add to plugins menu and toolbar
-        self.iface.addPluginToMenu("QGIS MCP", self.action)
+        self.iface.addPluginToMenu("qg server", self.action)
         self.iface.addToolBarIcon(self.action)
     
     def toggle_dock(self, checked):
@@ -643,7 +643,7 @@ class QgisMCPPlugin:
         if checked:
             # Create dock widget if it doesn't exist
             if not self.dock_widget:
-                self.dock_widget = QgisMCPDockWidget(self.iface)
+                self.dock_widget = QgDockWidget(self.iface)
                 self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dock_widget)
                 # Connect close event
                 self.dock_widget.closed.connect(self.dock_closed)
@@ -668,10 +668,10 @@ class QgisMCPPlugin:
             self.dock_widget = None
             
         # Remove plugin menu item and toolbar icon
-        self.iface.removePluginMenu("QGIS MCP", self.action)
+        self.iface.removePluginMenu("qg server", self.action)
         self.iface.removeToolBarIcon(self.action)
 
 
 # Plugin entry point
 def classFactory(iface):
-    return QgisMCPPlugin(iface)
+    return QgPlugin(iface)

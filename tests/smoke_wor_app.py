@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from qgis.core import QgsApplication
 from qgis.PyQt import sip
 from qgis.PyQt.QtWidgets import QMessageBox
-from qgis_mcp import wor_converter_app as ui
+from qg import wor_converter_app as ui
 
 
 class StandaloneUiSmoke(unittest.TestCase):

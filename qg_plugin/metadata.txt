@@ -1,5 +1,5 @@
 [general]
-name=QGIS MCP
+name=qg
 description=Servidor socket para ejecutar comandos MCP en QGIS
 version=1.0
 qgisMinimumVersion=3.0

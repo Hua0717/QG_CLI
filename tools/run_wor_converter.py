@@ -26,7 +26,7 @@ def main() -> int:
     try:
         app.initQgis()
         # Import the UI only after QGIS providers/authentication are initialized.
-        from qgis_mcp.wor_converter_app import main as show_window
+        from qg.wor_converter_app import main as show_window
         window = show_window()
         return app.exec()
     except Exception:

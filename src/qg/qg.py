@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-qg - command line client for the QGIS MCP plugin (stdlib only).
+qg - command line client for the qg server plugin inside QGIS (stdlib only).
 
-Every MCP tool is a subcommand. Each invocation opens its own short-lived
+Every command is a subcommand, sent as JSON over TCP to the qg server. Each invocation opens its own short-lived
 connection, so there is no long-lived session for an agent to drop.
 
 Instances: qg1..qg6 -> ports 9876..9881 (port = 9875 + N).
   qg1 ping            # QGIS instance 1 (port 9876)
   qg2 layers          # QGIS instance 2 (port 9877)
-  qg --port 9900 ping # explicit port (or env QGIS_MCP_PORT)
+  qg --port 9900 ping # explicit port (or env QG_PORT)
 """
 
 import argparse
@@ -29,7 +29,7 @@ def send(host, port, command, params, timeout):
         s = socket.create_connection((host, port), timeout=5)
     except OSError as e:
         sys.exit(f"qg: cannot connect to QGIS at {host}:{port} ({e}). "
-                 f"Start the server in the QGIS MCP plugin on that port.")
+                 f"Start the qg server in QGIS on that port.")
     try:
         s.settimeout(timeout)
         s.sendall(json.dumps({"type": command, "params": params}).encode("utf-8"))
@@ -122,7 +122,7 @@ def do_start(args, port, instance):
            "--code", os.path.join(here, "qg_startup.py")]
     if args.project:
         cmd.append(os.path.abspath(args.project))
-    env = dict(os.environ, QGIS_MCP_PORT=str(port),
+    env = dict(os.environ, QG_PORT=str(port),
                QG_REPO=os.path.abspath(os.path.join(here, "..", "..")))
     subprocess.Popen(cmd, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
                      stderr=subprocess.DEVNULL, close_fds=True,
@@ -167,7 +167,7 @@ def build_parser(instance=None):
         name = f"qg{instance}"
         desc = (f"{name}: command line client for QGIS instance {instance} "
                 f"(localhost:{BASE_PORT + instance}). One short-lived connection per call.\n"
-                f"In QGIS: QGIS MCP dock > Server Port = {BASE_PORT + instance} > Start Server.")
+                f"In QGIS: qg server dock > Server Port = {BASE_PORT + instance} > Start Server.")
     else:
         name = "qg"
         desc = __doc__
@@ -189,7 +189,7 @@ def build_parser(instance=None):
         return sp
 
     str_ = {"type": str}
-    sp = cmd("start", "Launch QGIS for this instance with the MCP server on its port",
+    sp = cmd("start", "Launch QGIS for this instance with the qg server on its port",
              ("--project", {"help": "project file to open"}),
              ("--profile", {"help": "QGIS profile (default: qgN; 'default' for your main one)"}),
              ("--wait", {"type": int, "default": 90, "help": "seconds to wait for the server"}),
@@ -245,7 +245,7 @@ def main(argv=None):
     elif args.instance:
         port = BASE_PORT + args.instance
     else:
-        port = int(os.environ.get("QGIS_MCP_PORT", BASE_PORT + 1))
+        port = int(os.environ.get("QG_PORT", BASE_PORT + 1))
 
     if args.cmd == "start":
         sys.exit(do_start(args, port, args.instance))
