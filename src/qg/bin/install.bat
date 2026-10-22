@@ -3,9 +3,12 @@ rem qg-path-setup.bat - run from an ADMINISTRATOR cmd.
 rem   1. add the qg bin folder to the SYSTEM Path (idempotent)
 rem   2. remove the duplicate from the USER Path (only after step 1 is confirmed)
 rem   3. broadcast the environment change
-rem Optional argument: the bin folder (default below).
+rem The bin folder is derived from this script's location: the script may sit
+rem IN bin or in its parent (src\qg). An optional argument overrides it.
 setlocal
-set "BINDIR=C:\Users\onn\Documents\GitHub\QG_CLI\src\qg\bin"
+set "D=%~dp0"
+set "BINDIR=%D%bin"
+if /i "%D:~-5%"=="\bin\" set "BINDIR=%D:~0,-1%"
 if not "%~1"=="" set "BINDIR=%~1"
 set "SELF=%~f0"
 net session >nul 2>&1
@@ -16,7 +19,7 @@ exit /b %errorlevel%
 $ErrorActionPreference = 'Stop'
 $bin = $env:BINDIR
 Write-Host "Wrapper folder: $bin"
-if (-not (Test-Path (Join-Path $bin 'qg.bat'))) { Write-Host "ERROR: $bin\qg.bat not found."; exit 1 }
+if (-not (Test-Path (Join-Path $bin 'qg.bat'))) { Write-Host "ERROR: $bin\qg.bat not found. Is this script inside the qg folder?"; exit 1 }
 
 function Norm($p) { $p.Trim().TrimEnd('\').ToLower() }
 function Has($path, $dir) { ($path -split ';' | Where-Object { $_ -ne '' } | ForEach-Object { Norm $_ }) -contains (Norm $dir) }
