@@ -26,7 +26,7 @@ via the bundled `qg_plugin` dock widget or via `qg start` / `qg_startup.py`.
    On Windows PowerShell:
    ```powershell
    $src = "$(pwd)\qg_plugin"
-   $dst = "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qgis_mcp"
+   $dst = "$env:APPDATA\QGIS\QGIS3\profiles\default\python\plugins\qg"
    New-Item -ItemType SymbolicLink -Path $dst -Target $src
    ```
 
