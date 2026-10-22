@@ -17,16 +17,29 @@ qg CLI (client)  ── TCP JSON, one short-lived connection per command ──�
 
 ## Install
 
-1. Clone this repository. There is nothing to `pip install`.
-2. Have Python 3 on your `PATH` and QGIS 3.x installed (the CLI locates `qgis.bat` automatically, or see `QGIS_BAT` below).
-3. Use the wrapper scripts in `src/qg/bin/`: `qg.bat` (generic passthrough) and `qg1.bat` … `qg6.bat` (pre-select instances 1–6). Each wrapper resolves its path relative to its own location, so they work wherever the repo is cloned.
+Quick start:
 
-### Adding qg to PATH
+```bat
+git clone https://github.com/Hua0717/QG_CLI.git
+cd QG_CLI
+src\qg\bin\install.bat        :: adds src\qg\bin to your user PATH
+```
 
-To call `qg`, `qg1`, … from any shell, put `src/qg/bin` on your `PATH`:
+Then in a **new** terminal:
 
-- **Manually**: open System Properties → Environment Variables, and append the `bin` folder's full path to your user `PATH`.
-- **Automatically**: run `install.bat` (see below), the bundled installer script, which adds the folder to your `PATH` for you.
+```bat
+qg --help
+qg1 start
+qg1 ping
+qg1 get_layers
+```
+
+Notes:
+
+- `install.bat` needs no admin rights — it writes only the user `PATH` under `HKCU\Environment` (no `setx`, so no 1024-char truncation). It is idempotent and safe to re-run.
+- Shells already open when you run `install.bat` keep their old `PATH`; open a new terminal to pick up the change. `uninstall.bat` removes the entry.
+- Prerequisites: Python 3 on your `PATH` and QGIS 3.x installed (the CLI locates `qgis.bat` automatically, or see `QGIS_BAT` below).
+- The repo can be cloned anywhere. The wrappers in `src/qg/bin/` (`qg.bat` generic passthrough, `qg1.bat` … `qg6.bat` pre-selecting instances 1–6) resolve paths relative to their own location, and `qg start` computes `QG_REPO` dynamically — nothing is hard-coded to a clone location.
 
 ## Usage
 
