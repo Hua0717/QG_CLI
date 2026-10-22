@@ -9,8 +9,8 @@ via the bundled `qg_plugin` dock widget or via `qg start` / `qg_startup.py`.
 
 1. **Clone the Repository**
    ```bash
-   git clone git@github.com:YOUR-USERNAME/qg.git
-   cd qg
+   git clone https://github.com/Hua0717/QG_CLI.git
+   cd QG_CLI
    ```
 
 2. **Install Prerequisites**
@@ -58,5 +58,5 @@ via the bundled `qg_plugin` dock widget or via `qg start` / `qg_startup.py`.
 
 ## Reporting Issues
 
-- Use [GitHub Issues](https://github.com/jjsantos01/qgis_mcp/issues).
+- Use [GitHub Issues](https://github.com/Hua0717/QG_CLI/issues).
 - Include OS, QGIS version, and error logs where relevant.
