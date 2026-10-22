@@ -35,24 +35,11 @@ rem ---- Add to user Path (idempotent) via the PowerShell registry API ----
 rem Reads/writes ONLY HKCU\Environment\Path (the user Path, never the
 rem combined machine+user Path) and writes it back as REG_EXPAND_SZ,
 rem avoiding setx's 1024-character truncation limit entirely.
-powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-    "function Norm($p) { $p.Trim().TrimEnd('\').ToLower() };" ^
-    "$bin = $args[0];" ^
-    "$k = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true);" ^
-    "$cur = [string]$k.GetValue('Path', '', 'DoNotExpandEnvironmentNames');" ^
-    "$parts = $cur -split ';' | Where-Object { $_ -ne '' };" ^
-    "$present = ($parts | ForEach-Object { Norm $_ }) -contains (Norm $bin);" ^
-    "if ($present) {" ^
-    "    Write-Host 'User Path already contains the entry - nothing to do (idempotent).'" ^
-    "} else {" ^
-    "    if ($cur.TrimEnd().EndsWith(';') -or $cur.Trim() -eq '') { $new = $cur + $bin } else { $new = $cur + ';' + $bin };" ^
-    "    $k.SetValue('Path', $new, [Microsoft.Win32.RegistryValueKind]::ExpandString);" ^
-    "    Write-Host 'Entry added to user Path.'" ^
-    "}" ^
-    "$k.Close();" ^
-    "Write-Host ''; Write-Host '---- AFTER (user Path) ----';" ^
-    "[Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment').GetValue('Path','','DoNotExpandEnvironmentNames')" ^
-    "%BINDIR%"
+rem The target folder is passed via the PS env var QG_BIN_DIR rather
+rem than as a positional argument, so it works under both cmd.exe
+rem and PowerShell callers (a trailing %BINDIR% arg breaks under PS).
+set "QG_BIN_DIR=%BINDIR%"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$bin = $env:QG_BIN_DIR; function Norm($p) { $p.Trim().TrimEnd('\').ToLower() }; $k = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true); $cur = [string]$k.GetValue('Path', '', 'DoNotExpandEnvironmentNames'); $parts = $cur -split ';' | Where-Object { $_ -ne '' }; $present = ($parts | ForEach-Object { Norm $_ }) -contains (Norm $bin); if ($present) { Write-Host 'User Path already contains the entry - nothing to do (idempotent).' } else { if ($cur.TrimEnd().EndsWith(';') -or $cur.Trim() -eq '') { $new = $cur + $bin } else { $new = $cur + ';' + $bin }; $k.SetValue('Path', $new, [Microsoft.Win32.RegistryValueKind]::ExpandString); Write-Host 'Entry added to user Path.' }; $k.Close(); Write-Host ''; Write-Host '---- AFTER (user Path) ----'; [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment').GetValue('Path','','DoNotExpandEnvironmentNames')"
 
 echo.
 echo NOTE: Only NEW terminals/processes will see the updated Path.

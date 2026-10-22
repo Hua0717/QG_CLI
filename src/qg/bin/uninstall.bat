@@ -23,24 +23,11 @@ echo Wrapper folder: %BINDIR%
 rem ---- Remove from user Path (idempotent), registry API only ----
 rem Reads/writes ONLY HKCU\Environment\Path (the user Path), keeping
 rem REG_EXPAND_SZ, so there is no setx truncation risk.
-powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-    "function Norm($p) { $p.Trim().TrimEnd('\').ToLower() };" ^
-    "$bin = $args[0];" ^
-    "$k = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true);" ^
-    "$cur = [string]$k.GetValue('Path', '', 'DoNotExpandEnvironmentNames');" ^
-    "$target = Norm $bin;" ^
-    "$present = (($cur -split ';') | Where-Object { $_ -ne '' } | ForEach-Object { Norm $_ }) -contains $target;" ^
-    "if (-not $present) {" ^
-    "    Write-Host 'Entry not present in user Path - nothing to do (idempotent).'" ^
-    "} else {" ^
-    "    $new = ($cur -split ';' | Where-Object { $_ -ne '' -and (Norm $_) -ne $target }) -join ';';" ^
-    "    $k.SetValue('Path', $new, [Microsoft.Win32.RegistryValueKind]::ExpandString);" ^
-    "    Write-Host 'Entry removed from user Path.'" ^
-    "}" ^
-    "$k.Close();" ^
-    "Write-Host ''; Write-Host '---- AFTER (user Path) ----';" ^
-    "[Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment').GetValue('Path','','DoNotExpandEnvironmentNames')" ^
-    "%BINDIR%"
+rem The target folder is passed via the PS env var QG_BIN_DIR rather
+rem than as a positional argument, so it works under both cmd.exe
+rem and PowerShell callers (a trailing %BINDIR% arg breaks under PS).
+set "QG_BIN_DIR=%BINDIR%"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$bin = $env:QG_BIN_DIR; function Norm($p) { $p.Trim().TrimEnd('\').ToLower() }; $k = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true); $cur = [string]$k.GetValue('Path', '', 'DoNotExpandEnvironmentNames'); $target = Norm $bin; $present = (($cur -split ';') | Where-Object { $_ -ne '' } | ForEach-Object { Norm $_ }) -contains $target; if (-not $present) { Write-Host 'Entry not present in user Path - nothing to do (idempotent).' } else { $new = ($cur -split ';' | Where-Object { $_ -ne '' -and (Norm $_) -ne $target }) -join ';'; $k.SetValue('Path', $new, [Microsoft.Win32.RegistryValueKind]::ExpandString); Write-Host 'Entry removed from user Path.' }; $k.Close(); Write-Host ''; Write-Host '---- AFTER (user Path) ----'; [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment').GetValue('Path','','DoNotExpandEnvironmentNames')"
 
 echo.
 echo NOTE: Current open shells still carry the old Path copy.
